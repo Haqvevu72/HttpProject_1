@@ -34,7 +34,7 @@ class Program
                 Car received_car = ByteToObject(data, bytesRead);
 
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write("\nResponse:");
+                Console.Write("\n\nResponse:");
                 Console.ForegroundColor = ConsoleColor.White;
 
                 Console.WriteLine($"{received_car}\n");
@@ -43,55 +43,58 @@ class Program
                 Console.Write("[2] [Post]\n");
                 Console.Write("[3] [Put]\n");
                 Console.Write("[4] [Delete]\n");
-                Console.Write("\nYour Choice:\n");
+                Console.Write("Your Choice: ");
             }
         });
 
 
         while (true)
         {
-            Console.Write("[1] [Get]\n");
-            Console.Write("[2] [Post]\n");
-            Console.Write("[3] [Put]\n");
-            Console.Write("[4] [Delete]\n");
-            Console.Write("\nYour Choice: ");
-            var method = Console.ReadLine();
-            Console.Write("Car Id: ");
-            int id = Convert.ToInt32(Console.ReadLine());
-            Console.Clear();
-
-            byte[] data = null;
-            var request = new MyCommand();
-            
-            if (method == "1")
+                byte[] data = null;
+                var request = new MyCommand();
+            while (true)
             {
-                request.HttpMethod = HttpMethods.Get;
-                request.Car = new Car() { Id = id };
-                data = ObjectToByte(request);
+                Console.Write("[1] [Get]\n");
+                Console.Write("[2] [Post]\n");
+                Console.Write("[3] [Put]\n");
+                Console.Write("[4] [Delete]\n");
+                Console.Write("Your Choice: ");
+                var method = Console.ReadLine();
+                Console.Write("Car Id: ");
+                int id = Convert.ToInt32(Console.ReadLine());
+                Console.Clear();
+
+
+                if (method == "1")
+                {
+                    request.HttpMethod = HttpMethods.Get;
+                    request.Car = new Car() { Id = id };
+                    data = ObjectToByte(request);
+                    break;
+                }
+                else if (method == "2")
+                {
+                    request.HttpMethod = HttpMethods.Post;
+                    request.Car = new Car() { Id = id };
+                    data = ObjectToByte(request);
+                    break;
+                }
+                else if (method == "3")
+                {
+                    request.HttpMethod = HttpMethods.Put;
+                    request.Car = new Car() { Id = id };
+                    data = ObjectToByte(request);
+                    break;
+                }
+                else if (method == "4")
+                {
+                    request.HttpMethod = HttpMethods.Delete;
+                    request.Car = new Car() { Id = id };
+                    data = ObjectToByte(request);
+                    break;
+                }
+
             }
-            else if (method == "2")
-            {
-                request.HttpMethod = HttpMethods.Post;
-                request.Car = new Car() { Id = id };
-                data = ObjectToByte(request);
-            }
-            else if (method == "3")
-            {
-                request.HttpMethod = HttpMethods.Put;
-                request.Car = new Car() { Id = id };
-                data = ObjectToByte(request);
-            }
-            else if (method == "4")
-            {
-                request.HttpMethod = HttpMethods.Delete;
-                request.Car = new Car() { Id = id };
-                data = ObjectToByte(request);
-            }
-
-
-
-
-
 
             stream.Write(data, 0, data.Length);
         }

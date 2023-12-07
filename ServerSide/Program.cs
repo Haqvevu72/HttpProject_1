@@ -76,8 +76,6 @@ class Program
             Console.WriteLine($"{client.Client.RemoteEndPoint} Connected.... ");
             var stream = client.GetStream();
 
-            //var binaryReader = new BinaryReader(stream);
-            //var binaryWriter = new BinaryWriter(stream);
 
             Task.Run(() =>
             {
@@ -99,6 +97,7 @@ class Program
                         {
                             if (MyCars[i].Id == myCommand.Car.Id)
                             {
+                                MyCars[i].status = Car.Status.None;
                                 byte[] car_bytes = ObjectToByte(MyCars[i]);
                                 stream.Write(car_bytes, 0, car_bytes.Length);
                                 Console.WriteLine("Car Has Sent !");
@@ -118,6 +117,10 @@ class Program
                         // Post method does not check updates , just add 
 
                         MyCars.Add(myCommand.Car);
+                        myCommand.Car.status= Car.Status.Added;
+                        byte[] car_bytes = ObjectToByte(myCommand.Car);
+                        stream.Write(car_bytes, 0, car_bytes.Length);
+                        Console.WriteLine("Car Has Added !");
                     }
                     else if (myCommand.HttpMethod == HttpMethods.Put)
                     {
@@ -140,13 +143,24 @@ class Program
                                     // Add modified car
                                     
                                     MyCars[i] = myCommand.Car;
+                                    myCommand.Car.status = Car.Status.Added;
+                                    byte[] car_bytes = ObjectToByte(myCommand.Car);
+                                    stream.Write(car_bytes, 0, car_bytes.Length);
+                                    Console.WriteLine("Car Has Added !");
                                 }
                                 IsCarFound = true;
                                 break;
                             }
                         }
-                        if(IsCarFound == false)
+                        if (IsCarFound == false)
+                        {
                             MyCars.Add(myCommand.Car);
+                            myCommand.Car.status = Car.Status.Added;
+                            byte[] car_bytes = ObjectToByte(myCommand.Car);
+                            stream.Write(car_bytes, 0, car_bytes.Length);
+                            Console.WriteLine("Car Has Added !");
+                        }
+
                     }
                     else if (myCommand.HttpMethod == HttpMethods.Delete)
                     {
@@ -156,8 +170,12 @@ class Program
                         {
                             if (MyCars[i].Id == myCommand.Car.Id)
                             {
+                                myCommand.Car.status = Car.Status.Deleted;
+                                byte[] car_bytes = ObjectToByte(myCommand.Car);
+                                stream.Write(car_bytes, 0, car_bytes.Length);
                                 MyCars.Remove(MyCars[i]);
                                 IsCarFound = true;
+                                Console.WriteLine("Car Has Deleted !");
                                 break;
                             }
                         }
