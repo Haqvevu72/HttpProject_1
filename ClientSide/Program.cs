@@ -31,18 +31,25 @@ class Program
                 byte[] data = new byte[client.ReceiveBufferSize];
                 int bytesRead = stream.Read(data, 0, data.Length);
 
-                Car received_car = ByteToObject(data, bytesRead);
+                var car_list = ByteToList(data, bytesRead);
+
+
 
                 Console.ForegroundColor = ConsoleColor.Green;
+                Console.Clear();
                 Console.Write("\n\nResponse:");
                 Console.ForegroundColor = ConsoleColor.White;
 
-                Console.WriteLine($"{received_car}\n");
+                for (int i = 0; i < car_list.Count; i++)
+                {
+                    Console.WriteLine(car_list[i]);
+                }
 
-                Console.Write("[1] [Get]\n");
+                Console.Write("\n[1] [Get]\n");
                 Console.Write("[2] [Post]\n");
                 Console.Write("[3] [Put]\n");
                 Console.Write("[4] [Delete]\n");
+                Console.Write("[5] [Get All]\n");
                 Console.Write("Your Choice: ");
             }
         });
@@ -58,12 +65,16 @@ class Program
                 Console.Write("[2] [Post]\n");
                 Console.Write("[3] [Put]\n");
                 Console.Write("[4] [Delete]\n");
+                Console.Write("[5] [Get All]\n");
                 Console.Write("Your Choice: ");
                 var method = Console.ReadLine();
-                Console.Write("Car Id: ");
-                int id = Convert.ToInt32(Console.ReadLine());
+                int id = 0;
                 Console.Clear();
-
+                if (method != "5") 
+                {
+                    Console.Write("Car Id: ");
+                    id = Convert.ToInt32(Console.ReadLine());
+                }
 
                 if (method == "1")
                 {
@@ -93,6 +104,12 @@ class Program
                     data = ObjectToByte(request);
                     break;
                 }
+                else if (method == "5")
+                {
+                    request.HttpMethod = HttpMethods.GetAll;
+                    data = ObjectToByte(request);
+                    break;
+                }
 
             }
 
@@ -113,14 +130,15 @@ class Program
             }
         }
 
-        Car ByteToObject(byte[] data, int bytesread)
+
+        List<Car> ByteToList(byte[] data , int bytesread)
         {
             // Deserialize the byte array into an object
             using (MemoryStream memoryStream = new MemoryStream(data, 0, bytesread))
             {
                 memoryStream.Position = 0;
 
-                Car receivedObject = (Car)binaryFormatter.Deserialize(memoryStream);
+                List<Car> receivedObject = (List<Car>)binaryFormatter.Deserialize(memoryStream);
 
                 return receivedObject;
             }

@@ -12,5 +12,6 @@ namespace MyClasses
         Post,
         Put,
         Delete,
+        GetAll
     }
 }

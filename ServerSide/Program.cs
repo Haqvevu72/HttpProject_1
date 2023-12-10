@@ -46,7 +46,7 @@ class Program
 
         Car? GetbyId(int Id) { return null; }
 
-        List<Car>? GetAll() { return null; }
+        List<Car>? GetAll() { return MyCars; }
 
         bool Add(Car car) { return false; }
 
@@ -98,7 +98,8 @@ class Program
                             if (MyCars[i].Id == myCommand.Car.Id)
                             {
                                 MyCars[i].status = Car.Status.None;
-                                byte[] car_bytes = ObjectToByte(MyCars[i]);
+                                List<Car> send_car = new List<Car>() { MyCars[i] };
+                                byte[] car_bytes = ListToByte(send_car);
                                 stream.Write(car_bytes, 0, car_bytes.Length);
                                 Console.WriteLine("Car Has Sent !");
 
@@ -118,7 +119,8 @@ class Program
 
                         MyCars.Add(myCommand.Car);
                         myCommand.Car.status= Car.Status.Added;
-                        byte[] car_bytes = ObjectToByte(myCommand.Car);
+                        List<Car> send_car = new List<Car>() { myCommand.Car };
+                        byte[] car_bytes = ListToByte(send_car);
                         stream.Write(car_bytes, 0, car_bytes.Length);
                         Console.WriteLine("Car Has Added !");
                     }
@@ -144,7 +146,8 @@ class Program
                                     
                                     MyCars[i] = myCommand.Car;
                                     myCommand.Car.status = Car.Status.Added;
-                                    byte[] car_bytes = ObjectToByte(myCommand.Car);
+                                    List<Car> send_car = new List<Car>() { myCommand.Car };
+                                    byte[] car_bytes = ListToByte(send_car);
                                     stream.Write(car_bytes, 0, car_bytes.Length);
                                     Console.WriteLine("Car Has Added !");
                                 }
@@ -156,7 +159,8 @@ class Program
                         {
                             MyCars.Add(myCommand.Car);
                             myCommand.Car.status = Car.Status.Added;
-                            byte[] car_bytes = ObjectToByte(myCommand.Car);
+                            List<Car> send_car = new List<Car>() { myCommand.Car };
+                            byte[] car_bytes = ListToByte(send_car);
                             stream.Write(car_bytes, 0, car_bytes.Length);
                             Console.WriteLine("Car Has Added !");
                         }
@@ -171,7 +175,8 @@ class Program
                             if (MyCars[i].Id == myCommand.Car.Id)
                             {
                                 myCommand.Car.status = Car.Status.Deleted;
-                                byte[] car_bytes = ObjectToByte(myCommand.Car);
+                                List<Car> send_car = new List<Car>() { myCommand.Car };
+                                byte[] car_bytes = ListToByte(send_car);
                                 stream.Write(car_bytes, 0, car_bytes.Length);
                                 MyCars.Remove(MyCars[i]);
                                 IsCarFound = true;
@@ -184,6 +189,16 @@ class Program
                         {
                             Console.WriteLine("Car not found !");
                         }
+                    }
+                    else if (myCommand.HttpMethod == HttpMethods.GetAll)
+                    {
+                        // Checking whether list is empty or not
+                        if (MyCars.Count != 0)
+                        {
+                            var list_byte = ListToByte(GetAll());
+                            stream.Write(list_byte, 0, list_byte.Length);
+                        }
+                        
                     }
 
                 }
@@ -209,6 +224,18 @@ class Program
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 binaryFormatter.Serialize(memoryStream, car);
+
+                byte[] data = memoryStream.ToArray();
+
+                return data;
+            }
+        }
+
+        byte[] ListToByte(List<Car> MyCars)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                binaryFormatter.Serialize(memoryStream, MyCars);
 
                 byte[] data = memoryStream.ToArray();
 
